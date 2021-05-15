@@ -6,11 +6,15 @@ using namespace std;
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "Shell.cpp"
+#include "ShellController.h"
 
 const int MAX = 100;
 
 void main()
 {
-    
+    auto controller = new ShellController();
+    while(true)
+    {
+        controller->readCommand();
+    }
 }
