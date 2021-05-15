@@ -1,4 +1,6 @@
-#include "Shell.h";
+#include "Shell.h"
+#include <string>
+#include <iostream>
 
 Shell::Shell()
 {

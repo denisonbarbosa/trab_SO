@@ -6,11 +6,9 @@ using namespace std;
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "Shell.cpp"
+#include "Shell.h"
 
-const int MAX = 100;
-
-void main()
+int main()
 {
     
 }
