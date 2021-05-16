@@ -8,9 +8,7 @@ using namespace std;
 #include <sys/wait.h>
 #include "ShellController.h"
 
-const int MAX = 100;
-
-void main()
+int main()
 {
     auto controller = new ShellController();
     while(true)
