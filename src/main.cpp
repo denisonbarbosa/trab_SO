@@ -6,9 +6,13 @@ using namespace std;
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "Shell.h"
+#include "ShellController.h"
 
 int main()
 {
-    
+    auto controller = new ShellController();
+    while(true)
+    {
+        controller->readCommand();
+    }
 }
