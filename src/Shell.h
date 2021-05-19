@@ -16,7 +16,7 @@ private:
     char *argv[MAX];
     int historySize = 0;
     list<char *> history;
-    unordered_map<char *, char *> env_vars; // TODO read & change content || matrix[2][n] -> n = number of var
+    unordered_map<char *, char *> env_vars; // TODO read & change content
 
 public:
     Shell();
