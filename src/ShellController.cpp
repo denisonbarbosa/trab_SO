@@ -6,16 +6,25 @@ using namespace std;
 
 void ShellController::readCommand()
 {
-    char *cmd_input, *cmd_output, **argv;
+    char *full_command, *cmd_input, *cmd_output, **argv;
+
+    std::cout << "tecii$ ";
     cin.get(cmd_input, 100, ' ');
+    strcpy(full_command, cmd_input);
+
     int i = 0;
-    while (cin.get(argv[i++], 100, ' '));
+    while (cin.get(argv[i], 100, ' '))
+    {
+        strcat(full_command, strcat(" ", argv[i]));
+        i++;
+    }
     argv[i] = nullptr;
 
-    this->evaluateCommand(cmd_input, i, argv);
+    bool status = this->evaluateCommand(cmd_input, i, argv);
+    active_shell->push_history(full_command);
 }
 
-void ShellController::evaluateCommand(char *cmd_input, int argc, char **argv)
+bool ShellController::evaluateCommand(char *cmd_input, int argc, char **argv)
 {
     /*
     COMMAND LIST:
@@ -30,55 +39,55 @@ void ShellController::evaluateCommand(char *cmd_input, int argc, char **argv)
     - bg: show foreground processes
     - set: view all environment variables
     */
-   if (strcmp(cmd_input, "history")==0)
-   {
-       active_shell->command_history();
-   }
-   else if (strcmp(cmd_input, "exit")==0)
-   {
-       active_shell->command_exit();
-   }
-   else if (strcmp(cmd_input, "kill")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_kill(argv[0]);
-   }
-   else if (strcmp(cmd_input, "jobs")==0)
-   {
-       active_shell->command_jobs();
-   }
-   else if (strcmp(cmd_input, "export")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_export(argv[0]);
-   }
-   else if (strcmp(cmd_input, "cd")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_cd(argv[0]);
-   }
-   else if (strcmp(cmd_input, "echo")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_echo(argv[0]);
-   }
-   else if (strcmp(cmd_input, "fg")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_fg(argv[0]);
-   }
-   else if (strcmp(cmd_input, "bg")==0)
-   {
-       // TODO: validate argument
-       active_shell->command_bg(argv[0]);
-   }
-   else if (strcmp(cmd_input, "set")==0)
-   {
-       active_shell->command_set();
-   }
-   else
-   {
-       /* code */
-   }
-   
+    if (strcmp(cmd_input, "history") == 0)
+    {
+        active_shell->command_history(); // Implemented - Needs testing
+    }
+    else if (strcmp(cmd_input, "exit") == 0)
+    {
+        active_shell->command_exit(); // Semi implemented
+    }
+    else if (strcmp(cmd_input, "kill") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_kill(argv[0]);
+    }
+    else if (strcmp(cmd_input, "jobs") == 0)
+    {
+        active_shell->command_jobs();
+    }
+    else if (strcmp(cmd_input, "export") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_export(argv[0], argv[1]); // Implemented - Needs testing
+    }
+    else if (strcmp(cmd_input, "cd") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_cd(argv[0]);
+    }
+    else if (strcmp(cmd_input, "echo") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_echo(argv[0]); // Implemented - Needs testing
+    }
+    else if (strcmp(cmd_input, "fg") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_fg(argv[0]);
+    }
+    else if (strcmp(cmd_input, "bg") == 0)
+    {
+        // TODO: validate argument
+        active_shell->command_bg(argv[0]);
+    }
+    else if (strcmp(cmd_input, "set") == 0)
+    {
+        active_shell->command_set(); // Implemented - Needs testing
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }

@@ -15,7 +15,7 @@ public:
     }
     ~ShellController();
     void readCommand();
-    void evaluateCommand(char *command, int argc, char **argv);
+    bool evaluateCommand(char *command, int argc, char **argv);
 };
 
 ShellController::~ShellController()
