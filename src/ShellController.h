@@ -14,8 +14,8 @@ private:
 public:
     ShellController();
     ~ShellController();
-    void readCommand();
-    bool evaluateCommand(std::string command, int argc, std::vector<std::string> argv);
+    void read_command();
+    bool evaluate_command(std::string command, int argc, std::vector<std::string> argv);
 };
 
 #endif // SHELL_CONTROLER_H
