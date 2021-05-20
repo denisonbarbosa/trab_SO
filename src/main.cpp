@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <iostream>
-using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -8,7 +7,7 @@ using namespace std;
 #include <sys/wait.h>
 #include "ShellController.h"
 
-void main()
+int main()
 {
     auto controller = new ShellController();
     while(true)

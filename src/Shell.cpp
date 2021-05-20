@@ -1,20 +1,21 @@
 #include "Shell.h"
-#include <string.h>
-#include <iostream>
-using namespace std;
+
+Shell::Shell()
+{
+}
 
 Shell::~Shell()
 {
 }
 
-void Shell::push_history(char *cmd)
+void Shell::push_history(std::string cmd)
 {
     if (this->historySize == 50) // If the list has 50
     {
         this->pop_history(); // Removes the "oldest"
     }
     history.push_back(cmd); // Adds to the end of the list
-    historySize++; // Updates the counter
+    historySize++;          // Updates the counter
 }
 
 void Shell::pop_history()
@@ -24,29 +25,14 @@ void Shell::pop_history()
         return;
     }
     history.pop_front(); // Removes the first element
-    historySize--; // Updates the counter
-}
-
-void Shell::set_cmd(char *new_cmd)
-{
-    *cmd = *new_cmd;
-}
-
-void Shell::set_cmd2(char *new_cmd2)
-{
-    *cmd2 = *new_cmd2;
-}
-
-void Shell::set_argv(char **new_argv)
-{
-    *argv = *new_argv;
+    historySize--;       // Updates the counter
 }
 
 void Shell::command_history()
 {
     for (auto const entry : this->history) // For each command in the data structure
     {
-        printf("%s\n", entry); // Print the entire command
+        std::cout << entry.c_str() << std::endl; // Print the entire command
     }
 }
 
@@ -55,7 +41,7 @@ void Shell::command_exit()
     exit(0);
 }
 
-void Shell::command_kill(char *argv)
+void Shell::command_kill(std::string arg)
 {
     // TODO
 }
@@ -65,7 +51,7 @@ void Shell::command_jobs()
     // TODO
 }
 
-void Shell::command_export(char *env_var, char *content)
+void Shell::command_export(std::string env_var, std::string content)
 {
     auto search = this->env_vars.find(env_var); // Searches the data structure for the requested environment variable
 
@@ -74,36 +60,36 @@ void Shell::command_export(char *env_var, char *content)
         this->env_vars.insert(std::make_pair(env_var, content)); // Create new pair and insert into the data structure
         return;
     }
-    search->second = strcat(search->second, content); // Append to the previous content
+    search->second.append(content); // Append to the previous content
 }
 
-void Shell::command_cd(char *argv)
+void Shell::command_cd(std::string arg)
 {
     // TODO
 }
 
-void Shell::command_echo(char *argv)
+void Shell::command_echo(std::string arg)
 {
-    auto env_var = this->env_vars.find(argv); // Searches the data structure for the requested environment variable
+    auto env_var = this->env_vars.find(arg); // Searches the data structure for the requested environment variable
 
-    char *answer;
     if (env_var == this->env_vars.end()) // If env_var not found, print string argv or empty line
     {
-        answer = argv;
-        if (argv[0] == '$')
-            answer = "\n";
-        printf("%s\n", answer);
+        if (arg[0] == '$')
+            std::cout << arg << std::endl;
+        else
+            std::cout << std::endl;
+
         return;
     }
-    printf("%s\n", env_var->second); // Prints content of the variable
+    std::cout << env_var->second << std::endl; // Prints content of the variable
 }
 
-void Shell::command_fg(char *argv)
+void Shell::command_fg(std::string arg)
 {
     // TODO
 }
 
-void Shell::command_bg(char *argv)
+void Shell::command_bg(std::string arg)
 {
     // TODO
 }
@@ -112,6 +98,6 @@ void Shell::command_set()
 {
     for (auto const var : this->env_vars) // For each environment variable in the data structure
     {
-        printf("%s = %s\n", var.first, var.second); // Print "name = content"
+        std::cout << "$" << var.first << " = " << var.second << std::endl; // Print "name = content"
     }
 }

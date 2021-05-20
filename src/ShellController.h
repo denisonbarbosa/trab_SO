@@ -1,6 +1,9 @@
-#ifndef __ShellControler_h
-#define __ShellControler_h
+#ifndef SHELL_CONTROLER_H
+#define SHELL_CONTROLER_H
 
+#include <string>
+#include <vector>
+#include <iostream>
 #include "Shell.h"
 
 class ShellController
@@ -9,18 +12,10 @@ private:
     Shell *active_shell;
 
 public:
-    ShellController() : active_shell{new Shell()}
-    {
-        // do nothing
-    }
+    ShellController();
     ~ShellController();
     void readCommand();
-    bool evaluateCommand(char *command, int argc, char **argv);
+    bool evaluateCommand(std::string command, int argc, std::vector<std::string> argv);
 };
 
-ShellController::~ShellController()
-{
-    // Limpar os ponteiros
-}
-
-#endif
+#endif // SHELL_CONTROLER_H
