@@ -1,8 +1,6 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <experimental/filesystem>
-#include <filesystem>
 #include <string>
 #include <list>
 #include <unordered_map>
@@ -11,6 +9,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <wait.h>
+#include <dirent.h>
 
 const int MAX = 100;
 
