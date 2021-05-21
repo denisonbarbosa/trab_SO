@@ -39,12 +39,13 @@ public:
     void command_bg(std::string arg);                                           // puts process ${arg} on background
     void command_set();                                                         // show all environment variables
     pid_t exec_program(std::string programName, std::vector<std::string> args); // executes a program
+    std::string search_program(std::string program_name);
     std::vector<std::string> break_env_var(std::string var_name);               // turns env_var string into std::vector
-    auto is_waiting() const;
+    inline auto is_waiting() const;
     void not_waiting();
 };
 
-auto Shell::is_waiting() const
+inline auto Shell::is_waiting() const
 {
     return waiting;
 }

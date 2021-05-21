@@ -1,5 +1,7 @@
 #include "Shell.h"
 
+namespace fs = std::experimental::filesystem;
+
 Shell::Shell()
 {
     std::pair<std::string, std::string> var = std::make_pair("PATH",
@@ -130,13 +132,29 @@ void Shell::command_set()
     }
 }
 
-pid_t Shell::exec_program(std::string programName, std::vector<std::string> args)
+pid_t Shell::exec_program(std::string program_name, std::vector<std::string> args)
 {
-    auto paths = break_env_var("MYPATH");
-    for (auto const path_it : paths)
+    auto program = search_program(program_name);
+    if (program.empty())
     {
-        std::experimental::filesystem::path path = path_it.c_str();
+        return execv(program.c_str(), nullptr);
     }
+    return 0;
+}
+
+std::string Shell::search_program(std::string program_name)
+{/*
+    auto paths = break_env_var("MYPATH");
+    for (auto path_it = paths.begin(); path_it != paths.end(); path_it++)
+    {
+        fs::path path = path_it->c_str();
+        for(auto entry = fs::directory_iterator(path); entry->path().empty(); entry++)
+        {
+            if (program_name.compare(entry->path().filename().string()) == 0)
+                return entry->path();
+        }
+    }*/
+    return std::string();
 }
 
 std::vector<std::string> Shell::break_env_var(std::string var_name)
