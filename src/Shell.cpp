@@ -4,8 +4,12 @@ namespace fs = std::experimental::filesystem;
 
 Shell::Shell()
 {
-    std::pair<std::string, std::string> var = std::make_pair("PATH",
-                                                             std::getenv("PATH"));
+    std::pair<std::string, std::string> path_var = std::make_pair("MYPATH", std::getenv("PATH"));
+    std::pair<std::string, std::string> user_var = std::make_pair("MYPS1", "tecii");
+    std::pair<std::string, std::string> pwd_var = std::make_pair("PWD", std::getenv("PWD"));
+    this->env_vars.insert(path_var);
+    this->env_vars.insert(user_var);
+    this->env_vars.insert(pwd_var);
 }
 
 Shell::~Shell()
