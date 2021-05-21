@@ -19,7 +19,8 @@ private:
     int historySize = 0;                                   // Counter of the number of history entries
     std::list<std::string> history;                        // Data structure that stores the last 50 commands
     std::unordered_map<std::string, std::string> env_vars; // Data structure that stores the environment variables
-    std::unordered_map<pid_t, std::string> processes;      // Map that stores active processes | true: foreground false: background
+    std::unordered_map<pid_t, std::string> children;       // Map that stores active processes
+    std::unordered_map<std::string, int> SIGNALS;          // Map that stores all the possible signals
     pid_t active_process;                                  // Current process
     bool waiting = false;
 
@@ -31,7 +32,7 @@ public:
     void pop_history();                                                         // removes first command in history
     void command_history();                                                     // Show last 50 commands
     void command_exit();                                                        // close the shell
-    void command_kill(std::string);                                             // kills the ${arg} process
+    void command_kill(pid_t, std::string);                                      // kills the ${arg} process
     void command_jobs();                                                        // lists all jobs on the background
     void command_export(std::string entry);                                     // (re)defines environment variable
     void command_cd(std::string arg);                                           // directory navigation | update PDW
@@ -43,7 +44,7 @@ public:
     std::string search_program(std::string program_name);
     std::vector<std::string> break_env_var(std::string var_name); // turns env_var string into std::vector
     inline auto is_waiting() const;
-    void not_waiting();
+    void set_waiting(bool);
 };
 
 inline auto Shell::is_waiting() const

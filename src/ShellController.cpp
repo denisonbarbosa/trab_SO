@@ -58,8 +58,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("kill") == 0)
     {
-        // TODO: validate argument
-        active_shell->command_kill(argv[0]); // 14 - Implemented - Needs testing
+        active_shell->command_kill(std::stoi(argv[0]), argv[1]); // 14 - Implemented - Needs testing
     }
     else if (command.compare("jobs") == 0)
     {
@@ -72,7 +71,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     else if (command.compare("cd") == 0)
     {
         // TODO: validate argument
-        active_shell->command_cd(argv[0]); // 8 - Implemented - Needs testing
+        active_shell->command_cd(argv[0]); // 8 - Implemented - NOT WORKING AS IT SHOULD
     }
     else if (command.compare("echo") == 0)
     {
@@ -94,13 +93,22 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else
     {
+        this->active_shell->set_waiting(true);
+        if (argv[argc-1] == "&")
+        {
+            this->active_shell->set_waiting(false);
+        }
+
+        argv.pop_back();        
         auto child_pid = active_shell->exec_program(command, argv);
+
         if (child_pid > 0)
         {
             if (active_shell->is_waiting())
+            {
                 waitpid(child_pid, nullptr, 0);
+            }
         }
-        active_shell->not_waiting();
     }
     return true;
 }

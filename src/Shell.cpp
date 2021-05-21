@@ -4,19 +4,38 @@
 Shell::Shell()
 {
     // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
-    std::pair<std::string, std::string> path_var = std::make_pair("MYPATH", std::getenv("PATH"));
-    std::pair<std::string, std::string> user_var = std::make_pair("MYPS1", "tecii");
-    std::pair<std::string, std::string> pwd_var = std::make_pair("PWD", std::getenv("PWD"));
-    this->env_vars.insert(path_var);
-    this->env_vars.insert(user_var);
-    this->env_vars.insert(pwd_var);
+    this->env_vars.emplace("MYPATH", std::getenv("PATH"));
+    this->env_vars.emplace("MYPS1", "tecii");
+    this->env_vars.emplace("PWD", std::getenv("PWD"));
+
+    // Maps all the possible signals
+    this->SIGNALS.emplace("SIGHUP", 1);
+    this->SIGNALS.emplace("SIGINT", 2);
+    this->SIGNALS.emplace("SIGQUIT", 3);
+    this->SIGNALS.emplace("SIGILL", 4);
+    this->SIGNALS.emplace("SIGTRAP", 5);
+    this->SIGNALS.emplace("SIGABRT", 6);
+    this->SIGNALS.emplace("SIGIOT", 6);
+    this->SIGNALS.emplace("SIGBUS", 7);
+    this->SIGNALS.emplace("SIGKILL", 9);
+    this->SIGNALS.emplace("SIGSEGV", 11);
+    this->SIGNALS.emplace("SIGTERM", 15);
+    this->SIGNALS.emplace("SIGSTKFLT", 16);
+    this->SIGNALS.emplace("SIGCHLD", 17);
+    this->SIGNALS.emplace("SIGCONT", 18);
+    this->SIGNALS.emplace("SIGSTOP", 19);
+    this->SIGNALS.emplace("SIGTSTP", 20);
+    this->SIGNALS.emplace("SIGTTIN", 21);
+    this->SIGNALS.emplace("SIGTTOU", 22);
+    this->SIGNALS.emplace("SIGXCPU", 24);
+    this->SIGNALS.emplace("SIGIO", 29);
+    this->SIGNALS.emplace("SIGSYS", 31);
 }
 
 // Shell destroyer
 Shell::~Shell()
 {
 }
-
 
 const std::string Shell::get_var_content(std::string var_name)
 {
@@ -61,24 +80,21 @@ void Shell::command_exit() // For the exit command and CTRL + D
     exit(0); // Closes the Shell
 }
 
-void Shell::command_kill(std::string arg) // Kills the ${arg} process
+void Shell::command_kill(pid_t process_pid, std::string signal) // Kills the ${arg} process
 {
-    pid_t pid = std::stoi(arg); // Converts arg (string) to a pid
-    this->processes.erase(pid); // Remove the process
-    kill(pid, SIGKILL); // Send the signal to kill the process 
+    auto sig_iter = this->SIGNALS.find(signal); // Searches the map for the signal number
+    if (sig_iter == this->SIGNALS.end())
+        return;
+
+    kill(process_pid, sig_iter->second); // Send the signal to the process
 }
 
 void Shell::command_jobs() // Lists all jobs on the background
 {
 
-    for (auto const process : this->processes) // // For each jobs on the background
+    for (auto const child : this->children) // // For each jobs on the background
     {
-<<<<<<< HEAD
-        std::cout << process.first << " " << process.second << std::endl;
-=======
-        if (!process.second)
-            std::cout << process.first << std::endl; // Print the job
->>>>>>> 6f3f0fdea50b3d101e60d584517c292f08405098
+        std::cout << child.first << " " << child.second << std::endl; // Print the job
     }
 }
 
@@ -101,9 +117,9 @@ void Shell::command_export(std::string entry) // (Re)defines environment variabl
         }
     }
 
-    for (; i < entry.length(); i++)
+    while (i < entry.length())
     {
-        aux.push_back(entry[i]);
+        aux.push_back(entry[i++]);
     }
 
     if (!source_var_name.empty())
@@ -151,12 +167,14 @@ void Shell::command_echo(std::string arg) // Prints ${arg} content on screen
 
 void Shell::command_fg(std::string arg) // puts process ${arg} on foreground
 {
-    this->processes.find(std::stoi(arg))->second = true; 
+    auto child_pid = this->children.find(std::stoi(arg))->first;
+    waitpid(child_pid, nullptr, 0);
 }
 
 void Shell::command_bg(std::string arg) // puts process ${arg} on background
 {
-    this->processes.find(std::stoi(arg))->second = false; 
+    auto child_pid = this->children.find(std::stoi(arg))->first;
+    this->command_kill(child_pid, "SIGCONT");
 }
 
 void Shell::command_set()
@@ -177,10 +195,14 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
         for (auto const arg : args)
             arg.copy(argv[argc++], arg.length(), 0);
 
-        auto child_process = fork();
-        if (child_process == 0)
-            return execv(program.c_str(), argv);
-        else if ()
+        auto pid = fork();
+        if (pid == 0)
+        {
+            execv(program.c_str(), argv);
+        }
+
+        this->children.emplace(pid, program_name);
+        return pid;
     }
     return 0;
 }
@@ -231,7 +253,7 @@ std::vector<std::string> Shell::break_env_var(std::string var_name)
     return pieces;
 }
 
-void Shell::not_waiting()
+void Shell::set_waiting(bool status)
 {
-    waiting = false;
+    this->waiting = status;
 }
