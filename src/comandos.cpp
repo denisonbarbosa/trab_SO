@@ -1,48 +1,27 @@
-/* 
-Verificação se é o comando history 
-//9
-if (strncmp(cmd, "history", 7) == 0)
-{
-}
-
-/* Verificação se é o camando exit 
-//11
-if (strncmp(cmd, "exit", 4) == 0)
-    exit(0);
-
-
-/* Verificação se é o comando kill 
-//14
-if (strncmp(cmd, "kill", 4) == 0)
-{
- 
-}
-      
-Verificação se é o comando jobs 
-//15
-if (strncmp(cmd, "jobs", 4) == 0)
-{
- 
-}    
-
-/* Verificação se é o comando fg 
-//16
-if (strncmp(cmd, "fg", 2) == 0)
-{
- 
-}      
-
-/Verificação se é o comando bg 
-//17
-if (strncmp(comando, "bg", 2) == 0)
-{
- 
-}      
-
-/* Verificação se é o comando set 
-//20
-if (strncmp(comando, "set", 3) == 0)
-{
- 
-}
+/*
+IMPLEMENTED -> 6, 7, 10, 12, 19, 20
+NEED TO TEST -> 8, 9, 11, 14
+SEMI IMPLEMENTED -> 15, 16, 17
+NOT IMPLEMENTED -> 13, 18
+? -> 1, 2, 3, 4, 5
+1- ?
+2- ?
+3- ?
+4- ?
+5- ?
+6- IMPLEMENTED
+7- IMPLEMENTED
+8- IMPLEMENTED - NEED TO TEST
+9- IMPLEMENTED - NEED TO TEST
+10- IMPLEMENTED
+11- IMPLEMENTED - NEED TO TEST
+12- IMPLEMENTED
+13- NOT IMPLEMENTED - SIGTSTP
+14- IMPLEMENTED - NEED TO TEST
+15- SEMI IMPLEMENTED
+16- SEMI IMPLEMENTED
+17- SEMI IMPLEMENTED
+18- NOT IMPLEMENTED - SIGCHLD
+19- IMPLEMENTED
+20- IMPLEMENTED
 */
