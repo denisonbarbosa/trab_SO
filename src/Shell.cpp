@@ -99,19 +99,6 @@ void Shell::command_echo(std::string arg)
     {
         std::cout << arg << std::endl;
     }
-
-    auto env_var = this->env_vars.find(arg); // Searches the data structure for the requested environment variable
-
-    if (env_var == this->env_vars.end()) // If env_var not found, print string argv or empty line
-    {
-        if (arg[0] == '$')
-            std::cout << arg << std::endl;
-        else
-            std::cout << std::endl;
-
-        return;
-    }
-    std::cout << env_var->second << std::endl; // Prints content of the variable
 }
 
 void Shell::command_fg(std::string arg)
@@ -135,9 +122,14 @@ void Shell::command_set()
 pid_t Shell::exec_program(std::string program_name, std::vector<std::string> args)
 {
     auto program = search_program(program_name);
-    if (program.empty())
+    if (!program.empty())
     {
-        return execv(program.c_str(), nullptr);
+        char** argv = new char*[args.size()];
+        int argc = 0;
+        for (auto const arg : args)
+            arg.copy(argv[argc++], arg.length(), 0);
+
+        return execv(program.c_str(), argv);
     }
     return 0;
 }

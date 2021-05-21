@@ -12,7 +12,7 @@ ShellController::~ShellController()
 
 void ShellController::read_command()
 {
-    std::string buffer, command;
+    std::string buffer, command, aux;
     std::vector<std::string> argv; // argv[0..n] = arguments
     int argc = 0;
 
@@ -29,27 +29,18 @@ void ShellController::read_command()
             std::cout << "Error: " << e.what() << std::endl;
         this->active_shell->command_exit();
     }
-
-    std::cout << buffer << std::endl;
     active_shell->push_history(buffer);
 
-    size_t position = 0;
-    while ((position = buffer.find(" ")) != std::string::npos)
+    // Iterates through buffer and breaks it into the args
+    std::istringstream buffer_stream(buffer);
+    while (std::getline(buffer_stream, aux, ' '))
     {
-        argv.push_back(buffer.substr(0, position));
-        buffer.erase(position + 1);
+        argv.push_back(aux);
         argc++;
     }
 
-    command = argv[0];
+    command.assign(argv[0].c_str());
     argv.erase(argv.begin());
-
-    // DEBUG
-    std::cout << "comando: " << command << " argc: " << argc << std::endl;
-    for (int i = 0; i < argv.size(); i++)
-    {
-        std::cout << argv[i] << std::endl;
-    }
 
     bool status = this->evaluate_command(command, argc, argv);
 }
