@@ -26,6 +26,7 @@ private:
 public:
     Shell();
     ~Shell();
+    const std::string get_var_content(std::string);
     void push_history(std::string);                                             // adds ${arg} to the end of history list
     void pop_history();                                                         // removes first command in history
     void command_history();                                                     // Show last 50 commands

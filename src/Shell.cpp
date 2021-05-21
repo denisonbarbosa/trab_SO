@@ -4,6 +4,7 @@ namespace fs = std::experimental::filesystem;
 
 Shell::Shell()
 {
+    // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
     std::pair<std::string, std::string> path_var = std::make_pair("MYPATH", std::getenv("PATH"));
     std::pair<std::string, std::string> user_var = std::make_pair("MYPS1", "tecii");
     std::pair<std::string, std::string> pwd_var = std::make_pair("PWD", std::getenv("PWD"));
@@ -14,6 +15,16 @@ Shell::Shell()
 
 Shell::~Shell()
 {
+}
+
+const std::string Shell::get_var_content(std::string var_name)
+{
+    auto var = this->env_vars.find(var_name);
+    
+    if(var == this->env_vars.end())
+        return nullptr;
+
+    return var->second;
 }
 
 void Shell::push_history(std::string cmd)
@@ -128,7 +139,7 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
     auto program = search_program(program_name);
     if (!program.empty())
     {
-        char** argv = new char*[args.size()];
+        char **argv = new char *[args.size()];
         int argc = 0;
         for (auto const arg : args)
             arg.copy(argv[argc++], arg.length(), 0);
@@ -139,7 +150,7 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
 }
 
 std::string Shell::search_program(std::string program_name)
-{/*
+{ /*
     auto paths = break_env_var("MYPATH");
     for (auto path_it = paths.begin(); path_it != paths.end(); path_it++)
     {

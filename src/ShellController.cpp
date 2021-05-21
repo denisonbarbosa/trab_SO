@@ -12,11 +12,12 @@ ShellController::~ShellController()
 
 void ShellController::read_command()
 {
-    std::string buffer, command, aux;
+    std::string buffer, command, aux, myps1_content;
     std::vector<std::string> argv; // argv[0..n] = arguments
     int argc = 0;
 
-    std::cout << "tecii$ ";
+    myps1_content = active_shell->get_var_content("MYPS1");
+    std::cout << myps1_content << "$ ";
 
     std::cin.exceptions(std::cin.failbit | std::cin.eofbit);
     try
@@ -77,7 +78,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     else if (command.compare("echo") == 0)
     {
         // TODO: validate argument
-        active_shell->command_echo(argv[0]); // 19 - Implemented - Needs testing
+        active_shell->command_echo(argv[0]); // 19 - Implemented - Working properly
     }
     else if (command.compare("fg") == 0)
     {

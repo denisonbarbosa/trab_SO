@@ -1,2 +1,2 @@
 #!/bin/bash
-./bin/a.out
+./bin/main
