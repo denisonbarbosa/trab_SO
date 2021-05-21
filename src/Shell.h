@@ -19,7 +19,8 @@ private:
     int historySize = 0;                                   // Counter of the number of history entries
     std::list<std::string> history;                        // Data structure that stores the last 50 commands
     std::unordered_map<std::string, std::string> env_vars; // Data structure that stores the environment variables
-    std::unordered_map<pid_t, bool> processes;             // Map that stores active processes | true: foreground false: background
+    std::unordered_map<pid_t, std::string> processes;      // Map that stores active processes | true: foreground false: background
+    pid_t active_process;                                  // Current process
     bool waiting = false;
 
 public:

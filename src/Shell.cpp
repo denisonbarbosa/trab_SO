@@ -72,8 +72,7 @@ void Shell::command_jobs() // lists all jobs on the background
 
     for (auto const process : this->processes)
     {
-        if (!process.second)
-            std::cout << process.first << std::endl;
+        std::cout << process.first << " " << process.second << std::endl;
     }
 }
 
@@ -172,7 +171,10 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
         for (auto const arg : args)
             arg.copy(argv[argc++], arg.length(), 0);
 
-        return execv(program.c_str(), argv);
+        auto child_process = fork();
+        if (child_process == 0)
+            return execv(program.c_str(), argv);
+        else if ()
     }
     return 0;
 }
