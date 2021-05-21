@@ -1,7 +1,5 @@
 #include "Shell.h"
 
-namespace fs = std::experimental::filesystem;
-
 Shell::Shell()
 {
     // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
@@ -150,18 +148,26 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
 }
 
 std::string Shell::search_program(std::string program_name)
-{ /*
+{
+    struct dirent *entry = nullptr;
+    DIR *dp = nullptr;
     auto paths = break_env_var("MYPATH");
-    for (auto path_it = paths.begin(); path_it != paths.end(); path_it++)
-    {
-        fs::path path = path_it->c_str();
-        for(auto entry = fs::directory_iterator(path); entry->path().empty(); entry++)
-        {
-            if (program_name.compare(entry->path().filename().string()) == 0)
-                return entry->path();
+    auto ret = std::string();
+
+    for (auto path : paths)
+    {    
+        dp = opendir(path.c_str());
+        if (dp != nullptr) {
+            while (entry = readdir(dp))
+            {
+                if(program_name.compare(entry->d_name))
+                    ret = path.append(entry->d_name);
+            }
         }
-    }*/
-    return std::string();
+
+        closedir(dp);
+    }
+    return ret;
 }
 
 std::vector<std::string> Shell::break_env_var(std::string var_name)
