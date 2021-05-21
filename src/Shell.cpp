@@ -1,5 +1,6 @@
 #include "Shell.h"
 
+// Shell starter
 Shell::Shell()
 {
     // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
@@ -11,9 +12,11 @@ Shell::Shell()
     this->env_vars.insert(pwd_var);
 }
 
+// Shell destroyer
 Shell::~Shell()
 {
 }
+
 
 const std::string Shell::get_var_content(std::string var_name)
 {
@@ -25,7 +28,7 @@ const std::string Shell::get_var_content(std::string var_name)
     return var->second;
 }
 
-void Shell::push_history(std::string cmd)
+void Shell::push_history(std::string cmd) // Update the list of used commands
 {
     if (this->historySize == 50) // If the list has 50
     {
@@ -35,7 +38,7 @@ void Shell::push_history(std::string cmd)
     historySize++;          // Updates the counter
 }
 
-void Shell::pop_history()
+void Shell::pop_history() // Remove element from the list of used commands
 {
     if (this->historySize == 0) // If there's no command, returns
     {
@@ -45,7 +48,7 @@ void Shell::pop_history()
     historySize--;       // Updates the counter
 }
 
-void Shell::command_history()
+void Shell::command_history() // Show last 50 commands
 {
     for (auto const entry : this->history) // For each command in the data structure
     {
@@ -53,31 +56,29 @@ void Shell::command_history()
     }
 }
 
-void Shell::command_exit()
+void Shell::command_exit() // For the exit command and CTRL + D
 {
-    // TODO: CTRL+D -> EOF, not a signal
-    exit(0);
+    exit(0); // Closes the Shell
 }
 
-void Shell::command_kill(std::string arg)
+void Shell::command_kill(std::string arg) // Kills the ${arg} process
 {
-    // TODO
-    pid_t pid = std::stoi(arg);
-    this->processes.erase(pid);
-    kill(pid, SIGKILL);
+    pid_t pid = std::stoi(arg); // Converts arg (string) to a pid
+    this->processes.erase(pid); // Remove the process
+    kill(pid, SIGKILL); // Send the signal to kill the process 
 }
 
-void Shell::command_jobs() // lists all jobs on the background
+void Shell::command_jobs() // Lists all jobs on the background
 {
 
-    for (auto const process : this->processes)
+    for (auto const process : this->processes) // // For each jobs on the background
     {
         if (!process.second)
-            std::cout << process.first << std::endl;
+            std::cout << process.first << std::endl; // Print the job
     }
 }
 
-void Shell::command_export(std::string entry)
+void Shell::command_export(std::string entry) // (Re)defines environment variable
 {
     std::string dest_var_name, source_var_name, aux, content;
     std::vector<std::string> vars;
@@ -115,7 +116,7 @@ void Shell::command_export(std::string entry)
     env_var->second = content;
 }
 
-void Shell::command_cd(std::string arg)
+void Shell::command_cd(std::string arg) // Directory navigation | update PDW
 {
     auto path = this->env_vars.find("PWD")->second;
     path.append(arg);
@@ -127,7 +128,7 @@ void Shell::command_cd(std::string arg)
     this->command_export(content);
 }
 
-void Shell::command_echo(std::string arg)
+void Shell::command_echo(std::string arg) // Prints ${arg} content on screen
 {
     if (arg[0] == '$')
     {
@@ -144,14 +145,14 @@ void Shell::command_echo(std::string arg)
     }
 }
 
-void Shell::command_fg(std::string arg)
+void Shell::command_fg(std::string arg) // puts process ${arg} on foreground
 {
-    this->processes.find(std::stoi(arg))->second = true; // puts process ${arg} on foreground
+    this->processes.find(std::stoi(arg))->second = true; 
 }
 
-void Shell::command_bg(std::string arg)
+void Shell::command_bg(std::string arg) // puts process ${arg} on background
 {
-    this->processes.find(std::stoi(arg))->second = false; // puts process ${arg} on background
+    this->processes.find(std::stoi(arg))->second = false; 
 }
 
 void Shell::command_set()
