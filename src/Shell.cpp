@@ -18,8 +18,8 @@ Shell::~Shell()
 const std::string Shell::get_var_content(std::string var_name)
 {
     auto var = this->env_vars.find(var_name);
-    
-    if(var == this->env_vars.end())
+
+    if (var == this->env_vars.end())
         return nullptr;
 
     return var->second;
@@ -77,16 +77,42 @@ void Shell::command_jobs() // lists all jobs on the background
     }
 }
 
-void Shell::command_export(std::string env_var, std::string content)
+void Shell::command_export(std::string entry)
 {
-    auto search = this->env_vars.find(env_var); // Searches the data structure for the requested environment variable
-
-    if (search == this->env_vars.end()) // If didn't find
+    std::string dest_var_name, source_var_name, aux, content;
+    std::vector<std::string> vars;
+    int i = 0;
+    while (entry[i] != '=')
     {
-        this->env_vars.insert(std::make_pair(env_var, content)); // Create new pair and insert into the data structure
+        dest_var_name.push_back(entry[i++]);
+    }
+    i++;
+    if (entry[i] == '$')
+    {
+        i++;
+        while (entry[i] != ':')
+        {
+            source_var_name.push_back(entry[i++]);
+        }
+    }
+
+    for (; i < entry.length(); i++)
+    {
+        aux.push_back(entry[i]);
+    }
+
+    if (!source_var_name.empty())
+        content.append(this->get_var_content(source_var_name).c_str());
+
+    content.append(aux);
+
+    auto env_var = this->env_vars.find(dest_var_name);
+    if (env_var == this->env_vars.end())
+    {
+        this->env_vars.insert(std::make_pair(dest_var_name, content));
         return;
     }
-    search->second.append(content); // Append to the previous content
+    env_var->second = content;
 }
 
 void Shell::command_cd(std::string arg)
@@ -94,7 +120,11 @@ void Shell::command_cd(std::string arg)
     auto path = this->env_vars.find("PWD")->second;
     path.append(arg);
     chdir(path.c_str());
-    this->command_export("PWD", path);
+
+    std::string content;
+    content.assign("PWD=");
+    content.append(path);
+    this->command_export(content);
 }
 
 void Shell::command_echo(std::string arg)
@@ -155,12 +185,13 @@ std::string Shell::search_program(std::string program_name)
     auto ret = std::string();
 
     for (auto path : paths)
-    {    
+    {
         dp = opendir(path.c_str());
-        if (dp != nullptr) {
+        if (dp != nullptr)
+        {
             while (entry = readdir(dp))
             {
-                if(program_name.compare(entry->d_name))
+                if (program_name.compare(entry->d_name))
                     ret = path.append(entry->d_name);
             }
         }

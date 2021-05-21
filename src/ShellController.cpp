@@ -67,8 +67,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("export") == 0)
     {
-        // TODO: validate argument
-        active_shell->command_export(argv[0], argv[1]); // 7 - Implemented - Needs testing
+        active_shell->command_export(argv[0]); // 7 - Implemented - Working properly
     }
     else if (command.compare("cd") == 0)
     {
@@ -77,7 +76,6 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("echo") == 0)
     {
-        // TODO: validate argument
         active_shell->command_echo(argv[0]); // 19 - Implemented - Working properly
     }
     else if (command.compare("fg") == 0)
@@ -92,7 +90,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("set") == 0)
     {
-        active_shell->command_set(); // 20 - Implemented - Needs testing
+        active_shell->command_set(); // 20 - Implemented - Working properly
     }
     else
     {

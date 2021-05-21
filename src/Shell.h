@@ -32,7 +32,7 @@ public:
     void command_exit();                                                        // close the shell
     void command_kill(std::string);                                             // kills the ${arg} process
     void command_jobs();                                                        // lists all jobs on the background
-    void command_export(std::string env_var, std::string content);              // (re)defines environment variable
+    void command_export(std::string entry);                                     // (re)defines environment variable
     void command_cd(std::string arg);                                           // directory navigation | update PDW
     void command_echo(std::string arg);                                         // Prints ${arg} content on screen
     void command_fg(std::string arg);                                           // puts process ${arg} on foreground
@@ -40,7 +40,7 @@ public:
     void command_set();                                                         // show all environment variables
     pid_t exec_program(std::string programName, std::vector<std::string> args); // executes a program
     std::string search_program(std::string program_name);
-    std::vector<std::string> break_env_var(std::string var_name);               // turns env_var string into std::vector
+    std::vector<std::string> break_env_var(std::string var_name); // turns env_var string into std::vector
     inline auto is_waiting() const;
     void not_waiting();
 };
