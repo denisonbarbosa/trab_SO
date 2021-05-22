@@ -8,34 +8,43 @@ const auto controller = new ShellController();
 
 int main()
 {
-    
     signal(SIGINT, sigint_handler);
     signal(SIGTSTP, sigtstp_handler);
     signal(SIGCHLD, sigchld_handler);
     while (true)
-    {
         controller->read_command();
-    }
 }
 
-void sigint_handler(int sig_number) // Prevent the shell from ending when the Control + C keys are pressed
+/**
+ * @brief Signal handler for SIGINT
+ * 
+ * @param sig_number Id of the signal
+ */
+void sigint_handler(int sig_number)
 {
     if (sig_number == SIGINT)
         return;
 }
 
-void sigtstp_handler(int sig_number) // Take the function in the foreground and set it to sleep
+/**
+ * @brief Signal handler for SIGTSTP
+ * 
+ * @param sig_number Id of the signal
+ */
+void sigtstp_handler(int sig_number)
 {
-    if (sig_number == SIGTSTP) // SIGTSTP == CTRL + Z
-    {
-        
+    if (sig_number == SIGTSTP)
         return;
-    }
 }
 
-void sigchld_handler(int sig_number) // Avoid creating zombie processes
+/**
+ * @brief Signal handler for SIGCHLD
+ * 
+ * @param sig_number Id of the signal
+ */
+void sigchld_handler(int sig_number)
 {
-    if (sig_number == SIGCHLD) // Terminated or stopped child
+    if (sig_number == SIGCHLD)
     {
         auto pid = wait(nullptr);
         auto active_shell = controller->get_active_shell();

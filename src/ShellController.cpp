@@ -17,11 +17,11 @@ ShellController::~ShellController()
 
 void ShellController::read_command()
 {
-    std::string buffer, command, aux, myps1_content;
+    std::string buffer, command, aux;
     std::vector<std::string> argv; // argv[0..n] = arguments
     int argc = 0;
 
-    myps1_content = active_shell->get_var_content("MYPS1");
+    auto myps1_content = active_shell->get_var_content("MYPS1");
     std::cout << myps1_content << "$ ";
 
     std::cin.exceptions(std::cin.failbit | std::cin.eofbit);

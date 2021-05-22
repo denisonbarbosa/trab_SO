@@ -4,6 +4,7 @@ Shell::Shell()
 {
     // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
     this->env_vars.emplace("MYPATH", std::getenv("PATH"));
+    this->env_vars.emplace("MYHOME", std::getenv("PWD"));
     this->env_vars.emplace("MYPS1", "tecii");
     this->env_vars.emplace("PWD", std::getenv("PWD"));
 
@@ -252,7 +253,7 @@ std::vector<std::string> Shell::break_env_var(std::string var_name)
     while ((position = content.find(':')) != std::string::npos)
     {
         pieces.push_back(content.substr(0, position));
-        content.erase(position + 1);
+        content.erase(0, position + 1);
     }
     return pieces;
 }

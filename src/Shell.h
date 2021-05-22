@@ -17,11 +17,10 @@ class Shell
 {
 private:
     int historySize = 0;                                   // Counter of the number of history entries
-    std::list<std::string> history;                        // Data structure that stores the last 50 commands
-    std::unordered_map<std::string, std::string> env_vars; // Data structure that stores the environment variables
-    std::unordered_map<pid_t, std::string> children;       // Map that stores active processes
-    std::unordered_map<std::string, int> SIGNALS;          // Map that stores all the possible signals
-    pid_t active_process;                                  // Current process
+    std::list<std::string> history;                        // Map that stores the last 50 commands
+    std::unordered_map<std::string, std::string> env_vars; // Map that stores the environment variables | name -> value
+    std::unordered_map<pid_t, std::string> children;       // Map that stores active processes | pid -> program_name
+    std::unordered_map<std::string, int> SIGNALS;          // Map that stores all the possible signals | sig_name -> sig_number
     bool waiting = false;
 
 public:
@@ -47,30 +46,30 @@ public:
     /**
      * @brief Returns the content of the specified variable
      * 
-     * @param var_name 
+     * @param var_name Name of the variable
      * @return const std::string 
      */
     const std::string get_var_content(std::string var_name);
-    
+
     /**
      * @brief Adds a command to the list of commands
      * 
      * @param cmd string containing the entire command
      */
     void push_history(std::string cmd);
-    
+
     /**
      * @brief Removes the first ("oldest") command of the list
      * 
      */
     void pop_history();
-    
+
     /**
      * @brief Shows the last 50 commands used
      * 
      */
     void command_history();
-    
+
     /**
      * @brief Exit the application
      * 
@@ -84,7 +83,7 @@ public:
      * @param signal Name of the signal to send
      */
     void command_kill(pid_t process_pid, std::string signal);
-    
+
     /**
      * @brief Lists all jobs in the background
      * 
@@ -105,13 +104,13 @@ public:
      */
     void command_cd(std::string arg);
 
-        /**
+    /**
      * @brief Prints the content of the specified env_var or the string passed 
      * 
      * @param arg Value to be printed
      */
     void command_echo(std::string arg);
-    
+
     /**
      * @brief Puts the specified process on foreground
      * 
@@ -157,9 +156,8 @@ public:
      */
     std::vector<std::string> break_env_var(std::string var_name);
 
-
     inline auto is_waiting() const;
-    
+
     /**
      * @brief Sets waiting status of the Shell
      * 
