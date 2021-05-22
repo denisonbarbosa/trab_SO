@@ -226,7 +226,10 @@ std::string Shell::search_program(std::string program_name)
             while (entry = readdir(dp))
             {
                 if (program_name.compare(entry->d_name) == 0)
+                {
                     ret = (path + "/").append(entry->d_name);
+                    return ret;
+                }
             }
         }
 
