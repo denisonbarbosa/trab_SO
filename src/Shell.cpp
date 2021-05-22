@@ -198,7 +198,8 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
         auto pid = fork();
         if (pid == 0)
         {
-            execv(program.c_str(), argv);
+            auto err = execv(program.c_str(), argv);
+            exit(1);
         }
 
         this->children.emplace(pid, program_name);

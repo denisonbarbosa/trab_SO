@@ -30,6 +30,9 @@ void ShellController::read_command()
             std::cout << "Error: " << e.what() << std::endl;
         this->active_shell->command_exit();
     }
+    if(buffer.find_first_not_of(" ") == buffer.npos)
+        return;
+
     active_shell->push_history(buffer);
 
     // Iterates through buffer and breaks it into the args
@@ -39,6 +42,7 @@ void ShellController::read_command()
         argv.push_back(aux);
         argc++;
     }
+    argc--;
 
     command.assign(argv[0].c_str());
     argv.erase(argv.begin());
@@ -94,12 +98,14 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     else
     {
         this->active_shell->set_waiting(true);
-        if (argv[argc-1] == "&")
-        {
-            this->active_shell->set_waiting(false);
+        if(argc > 0){
+            if (argv[argc-1] == "&")
+            {    
+                this->active_shell->set_waiting(false);
+                argv.pop_back();
+            }
         }
 
-        argv.pop_back();        
         auto child_pid = active_shell->exec_program(command, argv);
 
         if (child_pid > 0)
