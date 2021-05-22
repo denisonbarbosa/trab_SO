@@ -1,6 +1,5 @@
 #include "Shell.h"
 
-// Shell starter
 Shell::Shell()
 {
     // Initialize the standard env_vars (MYPATH, MYPS1, PWD)
@@ -32,9 +31,13 @@ Shell::Shell()
     this->SIGNALS.emplace("SIGSYS", 31);
 }
 
-// Shell destroyer
 Shell::~Shell()
 {
+}
+
+void Shell::remove_child(pid_t child_pid)
+{
+    this->children.erase(child_pid);
 }
 
 const std::string Shell::get_var_content(std::string var_name)
@@ -47,58 +50,58 @@ const std::string Shell::get_var_content(std::string var_name)
     return var->second;
 }
 
-void Shell::push_history(std::string cmd) // Update the list of used commands
+void Shell::push_history(std::string cmd) 
 {
-    if (this->historySize == 50) // If the list has 50
+    if (this->historySize == 50)
     {
-        this->pop_history(); // Removes the "oldest"
+        this->pop_history();
     }
-    history.push_back(cmd); // Adds to the end of the list
-    historySize++;          // Updates the counter
+    history.push_back(cmd);
+    historySize++;
 }
 
-void Shell::pop_history() // Remove element from the list of used commands
+void Shell::pop_history()
 {
-    if (this->historySize == 0) // If there's no command, returns
+    if (this->historySize == 0)
     {
         return;
     }
-    history.pop_front(); // Removes the first element
-    historySize--;       // Updates the counter
+    history.pop_front();
+    historySize--;
 }
 
-void Shell::command_history() // Show last 50 commands
+void Shell::command_history()
 {
-    for (auto const entry : this->history) // For each command in the data structure
+    for (auto const entry : this->history)
     {
-        std::cout << entry << std::endl; // Print the entire command
+        std::cout << entry << std::endl;
     }
 }
 
-void Shell::command_exit() // For the exit command and CTRL + D
+void Shell::command_exit()
 {
-    exit(0); // Closes the Shell
+    exit(0);
 }
 
-void Shell::command_kill(pid_t process_pid, std::string signal) // Kills the ${arg} process
+void Shell::command_kill(pid_t process_pid, std::string signal)
 {
-    auto sig_iter = this->SIGNALS.find(signal); // Searches the map for the signal number
+    auto sig_iter = this->SIGNALS.find(signal);
     if (sig_iter == this->SIGNALS.end())
         return;
 
-    kill(process_pid, sig_iter->second); // Send the signal to the process
+    kill(process_pid, sig_iter->second);
 }
 
-void Shell::command_jobs() // Lists all jobs on the background
+void Shell::command_jobs()
 {
 
-    for (auto const child : this->children) // // For each jobs on the background
+    for (auto const child : this->children)
     {
-        std::cout << child.first << " " << child.second << std::endl; // Print the job
+        std::cout << child.first << " " << child.second << std::endl;
     }
 }
 
-void Shell::command_export(std::string entry) // (Re)defines environment variable
+void Shell::command_export(std::string entry)
 {
     std::string dest_var_name, source_var_name, aux, content;
     std::vector<std::string> vars;
@@ -136,7 +139,7 @@ void Shell::command_export(std::string entry) // (Re)defines environment variabl
     env_var->second = content;
 }
 
-void Shell::command_cd(std::string arg) // Directory navigation | update PDW
+void Shell::command_cd(std::string arg)
 {
     auto path = this->env_vars.find("PWD")->second;
     path.append(arg);
@@ -148,7 +151,7 @@ void Shell::command_cd(std::string arg) // Directory navigation | update PDW
     this->command_export(content);
 }
 
-void Shell::command_echo(std::string arg) // Prints ${arg} content on screen
+void Shell::command_echo(std::string arg)
 {
     if (arg[0] == '$')
     {
@@ -165,13 +168,13 @@ void Shell::command_echo(std::string arg) // Prints ${arg} content on screen
     }
 }
 
-void Shell::command_fg(std::string arg) // puts process ${arg} on foreground
+void Shell::command_fg(std::string arg)
 {
     auto child_pid = this->children.find(std::stoi(arg))->first;
     waitpid(child_pid, nullptr, 0);
 }
 
-void Shell::command_bg(std::string arg) // puts process ${arg} on background
+void Shell::command_bg(std::string arg)
 {
     auto child_pid = this->children.find(std::stoi(arg))->first;
     this->command_kill(child_pid, "SIGCONT");

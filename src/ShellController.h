@@ -15,6 +15,7 @@ private:
 public:
     ShellController();
     ~ShellController();
+    Shell* get_active_shell();
     void read_command();
     bool evaluate_command(std::string command, int argc, std::vector<std::string> argv);
 };
