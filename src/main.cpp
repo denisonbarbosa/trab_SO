@@ -33,8 +33,11 @@ void sigint_handler(int sig_number)
  */
 void sigtstp_handler(int sig_number)
 {
-    if (sig_number == SIGTSTP)
+    if (sig_number == SIGTSTP) // SIGTSTP == CTRL + Z
+    {
+        raise(SIGSTOP);
         return;
+    }
 }
 
 /**
