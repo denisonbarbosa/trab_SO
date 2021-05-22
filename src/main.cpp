@@ -4,48 +4,23 @@ void sigint_handler(int sig_number);
 void sigtstp_handler(int sig_number);
 void sigchld_handler(int sig_number);
 
-const auto controller = new ShellController();
+
 
 int main()
 {
-    // signal(SIGINT, sigint_handler);
-    // signal(SIGTSTP, sigtstp_handler);
-    // signal(SIGCHLD, sigchld_handler);
-    while (true)
-        controller->read_command();
+    auto controller = new ShellController();
+    // signal(SIGINT, sig_handler);
+    // signal(SIGTSTP, sig_handler);
+    // signal(SIGCHLD, sig_handler);
+    controller->start_shell_loop();
 }
 
 /**
- * @brief Signal handler for SIGINT
+ * @brief 
  * 
- * @param sig_number Id of the signal
+ * @param sig_number 
  */
-void sigint_handler(int sig_number)
-{
-    if (sig_number == SIGINT)
-        return;
-}
-
-/**
- * @brief Signal handler for SIGTSTP
- * 
- * @param sig_number Id of the signal
- */
-void sigtstp_handler(int sig_number)
-{
-    if (sig_number == SIGTSTP) // SIGTSTP == CTRL + Z
-    {
-        raise(SIGSTOP);
-        return;
-    }
-}
-
-/**
- * @brief Signal handler for SIGCHLD
- * 
- * @param sig_number Id of the signal
- */
-void sigchld_handler(int sig_number)
+void sig_handler(int sig_number)
 {
     if (sig_number == SIGCHLD)
     {
