@@ -8,9 +8,9 @@ const auto controller = new ShellController();
 
 int main()
 {
-    signal(SIGINT, sigint_handler);
-    signal(SIGTSTP, sigtstp_handler);
-    signal(SIGCHLD, sigchld_handler);
+    // signal(SIGINT, sigint_handler);
+    // signal(SIGTSTP, sigtstp_handler);
+    // signal(SIGCHLD, sigchld_handler);
     while (true)
         controller->read_command();
 }
@@ -49,9 +49,13 @@ void sigchld_handler(int sig_number)
 {
     if (sig_number == SIGCHLD)
     {
+        /*
         auto pid = wait(nullptr);
         auto active_shell = controller->get_active_shell();
         active_shell->remove_child(pid);
+        signal(SIGCHLD,SIG_IGN)
+        */
+
         return;
     }
 }

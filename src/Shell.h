@@ -145,7 +145,7 @@ public:
      * @param args Vector of arguments
      * @return id of the new process created
      */
-    pid_t exec_program(std::string programName, std::vector<std::string> args);
+    void exec_program(std::string programName, std::vector<std::string> args);
 
     /**
      * @brief Searches for the directory containing the specified program
@@ -163,7 +163,13 @@ public:
      */
     std::vector<std::string> break_env_var(std::string var_name);
 
-    inline auto is_waiting() const;
+    /**
+     * @brief Checks if Shell is waiting
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool is_waiting();
 
     /**
      * @brief Sets waiting status of the Shell
@@ -172,10 +178,4 @@ public:
      */
     void set_waiting(bool);
 };
-
-inline auto Shell::is_waiting() const
-{
-    return waiting;
-}
-
 #endif // SHELL_H

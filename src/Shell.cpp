@@ -34,6 +34,7 @@ Shell::Shell()
 
 Shell::~Shell()
 {
+    std::cout << "~Shell called by" << this << std::endl;
 }
 
 void Shell::remove_child(pid_t child_pid)
@@ -149,29 +150,40 @@ void Shell::command_cd()
 void Shell::command_cd(std::string arg)
 {
     std::string aux, path;
-    std::vector<std::string> pwd_pieces;
+    std::vector<std::string> pieces;
     
-    std::istringstream pwd_stream(this->get_var_content("PWD"));
-    while (std::getline(pwd_stream, aux, '/'))
+    if (arg[0] == '/')
     {
-        pwd_pieces.push_back(aux);
+        path.assign(arg);
     }
-    
-    std::istringstream path_stream(arg);
-    while (std::getline(path_stream, aux, '/'))
+    else
     {
-        if (aux.compare("..") == 0)
-            pwd_pieces.pop_back();
-        else
-            pwd_pieces.push_back(aux);
-    }
+        std::istringstream pwd_stream(this->get_var_content("PWD"));
+        while (std::getline(pwd_stream, aux, '/'))
+        {
+            pieces.push_back(aux);
+        }
+        
+        std::istringstream path_stream(arg);
+        while (std::getline(path_stream, aux, '/'))
+        {
+            if (aux.compare("..") == 0)
+                pieces.pop_back();
+            else
+                pieces.push_back(aux);
+        }
 
-    for (auto piece : pwd_pieces)
-    {
-        path.append(piece + "/");
+        for (auto piece : pieces)
+        {
+            path.append(piece + "/");
+        }
     }
     
-    chdir(path.c_str());
+    if (chdir(path.c_str()) != 0)
+    {
+        std::cout << "chdir() failed " << std::endl;
+        return;
+    }
 
     this->command_export("PWD=" + path);
 }
@@ -213,26 +225,57 @@ void Shell::command_set()
     }
 }
 
-pid_t Shell::exec_program(std::string program_name, std::vector<std::string> args)
-{
+void Shell::exec_program(std::string program_name, std::vector<std::string> args)
+{   
+    /*
+    auto pid = fork();
+    if (pid < 0) 
+    {
+        exit(-1);
+    }
+    else if (pid == 0)
+    {
+        
+    } else if (pid > 0) 
+    {
+
+    }
+    
+    */
+
     auto program = search_program(program_name);
     if (!program.empty())
     {
-        char **argv = new char *[args.size()];
-        int argc = 0;
-        for (auto const arg : args)
+
+        char* argv[args.size()+2];
+        program_name.copy(argv[0], program_name.length(), 0);
+        int argc = 1;
+        for (auto arg : args)
             arg.copy(argv[argc++], arg.length(), 0);
+        
+        argv[argc] = nullptr;
 
         auto pid = fork();
-        if (pid == 0)
+        if (pid < 0) 
+        {
+            exit(-1);
+        }
+        else if (pid == 0)
         {
             execv(program.c_str(), argv);
         }
-
-        this->children.emplace(pid, program_name);
-        return pid;
+        else if (pid > 0)
+        {
+            this->children.emplace(pid, program_name);
+            //pid = wait(nullptr);
+            //this->remove_child(pid);
+            if (this->is_waiting())
+            {
+                auto stat = waitpid(pid, nullptr, 0);
+                this->remove_child(pid);
+            }
+        }
     }
-    return 0;
 }
 
 std::string Shell::search_program(std::string program_name)
@@ -252,11 +295,11 @@ std::string Shell::search_program(std::string program_name)
                 if (program_name.compare(entry->d_name) == 0)
                 {
                     ret = (path + "/").append(entry->d_name);
+                    closedir(dp);
                     return ret;
                 }
             }
         }
-
         closedir(dp);
     }
     return ret;
@@ -287,4 +330,9 @@ std::vector<std::string> Shell::break_env_var(std::string var_name)
 void Shell::set_waiting(bool status)
 {
     this->waiting = status;
+}
+
+bool Shell::is_waiting()
+{
+    return this->waiting;
 }

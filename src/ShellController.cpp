@@ -12,7 +12,6 @@ ShellController::ShellController()
 
 ShellController::~ShellController()
 {
-    // Limpar os ponteiros
 }
 
 void ShellController::read_command()
@@ -58,11 +57,11 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
 {
     if (command.compare("history") == 0)
     {
-        active_shell->command_history(); // 9 - Implemented - Needs testing
+        active_shell->command_history();
     }
     else if (command.compare("exit") == 0)
     {
-        active_shell->command_exit(); // 11 - Implemented - Needs testing
+        active_shell->command_exit();
     }
     else if (command.compare("kill") == 0)
     {
@@ -74,18 +73,18 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("export") == 0)
     {
-        active_shell->command_export(argv[0]); // 7 - Implemented - Working properly
+        active_shell->command_export(argv[0]);
     }
     else if (command.compare("cd") == 0)
     {
         if (argv.empty())
             active_shell->command_cd();    
         else
-            active_shell->command_cd(argv[0]); // 8 - Implemented - NOT WORKING AS IT SHOULD
+            active_shell->command_cd(argv[0]);
     }
     else if (command.compare("echo") == 0)
     {
-        active_shell->command_echo(argv[0]); // 19 - Implemented - Working properly
+        active_shell->command_echo(argv[0]);
     }
     else if (command.compare("fg") == 0)
     {
@@ -99,7 +98,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("set") == 0)
     {
-        active_shell->command_set(); // 20 - Implemented - Working properly
+        active_shell->command_set();
     }
     else
     {
@@ -112,8 +111,9 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
             }
         }
 
-        auto child_pid = active_shell->exec_program(command, argv);
-
+        this->active_shell->exec_program(command, argv);
+        
+        /*
         if (child_pid > 0)
         {
             if (active_shell->is_waiting())
@@ -122,6 +122,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
                 active_shell->remove_child(child_pid);
             }
         }
+        */
     }
     return true;
 }
