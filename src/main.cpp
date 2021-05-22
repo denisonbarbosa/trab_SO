@@ -28,7 +28,8 @@ void sigtstp_handler(int sig_number) // Take the function in the foreground and 
 {
     if (sig_number == SIGTSTP) // SIGTSTP == CTRL + Z
     {
-        
+        raise(SIGSTOP);
+        //  teste
         return;
     }
 }
