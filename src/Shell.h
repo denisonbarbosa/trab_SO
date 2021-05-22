@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <wait.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 const int MAX = 100;
 

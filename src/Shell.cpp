@@ -228,11 +228,13 @@ void Shell::command_set()
 void Shell::exec_program(std::string command, int argc ,std::vector<std::string> argv, bool wait)
 {   
     auto program = this->search_program(command);
+    char** args = (char**)malloc(argv.size() + 2);
+    int fd_in, fd_out, fd_err;
+    int i = 0;
 
     if (program.empty())
         return;
 
-    char** args = (char**)malloc(argv.size() + 2);
     for (int c = 0; c < argv.size() + 2; c++)
     {
         args[c] = (char*)malloc(100 * sizeof(char));
@@ -240,14 +242,35 @@ void Shell::exec_program(std::string command, int argc ,std::vector<std::string>
 
     command.copy(args[0], command.length());
     
-    int i = 0;
     for (; i < argv.size(); i++)
     {
-        argv[i].copy(args[i+1], argv[i].length());
+        if(argv[i].compare("<")) // entrada
+        {
+            if(i+1 < argv.size())
+                fd_in = open(argv[++i].c_str(), O_RDONLY);
+        }
+        else if(argv[i].compare(">")) // saida
+        {
+            if(i+1 < argv.size())
+                fd_out = open(argv[++i].c_str(), O_WRONLY);
+        }
+        else if(argv[i].compare("2>")) // erro
+        {
+            if(i+1 < argv.size())
+                fd_err = open(argv[++i].c_str(), O_WRONLY);
+        }
+        else if(argv[i].compare("||")) // pipe
+        {
+            // TODO
+        }
+        else
+        {
+            argv[i].copy(args[i+1], argv[i].length());
+        }
     }
     i++;
     args[i] = nullptr;
-    
+
     int child_pid = fork();
     int child_status;
 
