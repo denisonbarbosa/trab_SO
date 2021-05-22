@@ -18,7 +18,6 @@ void ShellController::start_shell_loop()
     std::cin.exceptions(std::cin.failbit | std::cin.eofbit);
     while (true)        
     {
-        std::cout << this << std::endl;
         this->read_command();
     }
 }
@@ -56,12 +55,12 @@ void ShellController::read_command()
 
     command.assign(argv[0].c_str());
     argv.erase(argv.begin());
-
-    this->evaluate_command(command, argc, argv);
+    
+    ShellController* cntrol = this->evaluate_command(command, argc, argv);
     return;
 }
 
-void ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
+ShellController* ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
 {
     if (command.compare("history") == 0)
     {
@@ -110,32 +109,29 @@ void ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else
     {
-        /*
-        this->active_shell->set_waiting(true);
-        if(argc > 0){
-            if (argv[argc-1] == "&")
-            {    
-                this->active_shell->set_waiting(false);
-                argv.pop_back();
-            }
-        }
-        */
-
-        // this->active_shell->exec_program(command, argv);
-        
         auto program = this->active_shell->search_program(command);
 
         if (program.empty())
-            return;
+            return nullptr;
 
-        char *args[argv.size() + 2];
-        command.copy(args[0], command.length(), 0);
-        int argc = 1;
-        for (auto arg : argv)
-            arg.copy(args[argc++], arg.length(), 0);
-        args[argc] = nullptr;
+        char** args = (char**)malloc(argv.size() + 2);
+        for (int c = 0; c < argv.size() + 2; c++)
+        {
+            args[c] = (char*)malloc(100 * sizeof(char));
+        }
 
+        command.copy(args[0], command.length());
+        
+        int i = 0;
+        for (; i < argv.size(); i++)
+        {
+            argv[i].copy(args[i+1], argv[i].length());
+        }
+        i++;
+        args[i] = nullptr;
+        
         int child_pid = fork();
+        int child_status;
 
         if (child_pid == 0)
         {
@@ -144,12 +140,8 @@ void ShellController::evaluate_command(std::string command, int argc, std::vecto
         }
         else if (child_pid > 0)
         {
-            int child_status;
-            pid_t tpid;
-            do
-            {
-                tpid = wait(&child_status);
-            } while (tpid != child_pid);
+            waitpid(child_pid, &child_status, 0);
         }
     }
+    return this;
 }
