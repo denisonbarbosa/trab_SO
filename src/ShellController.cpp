@@ -56,11 +56,11 @@ void ShellController::read_command()
     command.assign(argv[0].c_str());
     argv.erase(argv.begin());
     
-    ShellController* cntrol = this->evaluate_command(command, argc, argv);
+    this->evaluate_command(command, argc, argv);
     return;
 }
 
-ShellController* ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
+void ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
 {
     if (command.compare("history") == 0)
     {
@@ -109,39 +109,6 @@ ShellController* ShellController::evaluate_command(std::string command, int argc
     }
     else
     {
-        auto program = this->active_shell->search_program(command);
-
-        if (program.empty())
-            return nullptr;
-
-        char** args = (char**)malloc(argv.size() + 2);
-        for (int c = 0; c < argv.size() + 2; c++)
-        {
-            args[c] = (char*)malloc(100 * sizeof(char));
-        }
-
-        command.copy(args[0], command.length());
-        
-        int i = 0;
-        for (; i < argv.size(); i++)
-        {
-            argv[i].copy(args[i+1], argv[i].length());
-        }
-        i++;
-        args[i] = nullptr;
-        
-        int child_pid = fork();
-        int child_status;
-
-        if (child_pid == 0)
-        {
-            execv(program.c_str(), args);
-            exit(0);
-        }
-        else if (child_pid > 0)
-        {
-            waitpid(child_pid, &child_status, 0);
-        }
+        this->active_shell->exec_program(command, argc, argv);
     }
-    return this;
 }

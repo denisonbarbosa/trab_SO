@@ -142,10 +142,11 @@ public:
      * @brief Executes the specified program
      * 
      * @param program_name Name of the program to execute
-     * @param args Vector of arguments
+     * @param arc Number of arguments
+     * @param argv Vector of arguments
      * @return id of the new process created
      */
-    void exec_program(std::string programName, std::vector<std::string> args);
+    void exec_program(std::string programName, int argc,std::vector<std::string> argv);
 
     /**
      * @brief Searches for the directory containing the specified program

@@ -51,7 +51,7 @@ public:
      * @param argc Number of arguments
      * @param argv Vector of arguments
      */
-    ShellController* evaluate_command(std::string command, int argc, std::vector<std::string> argv);
+    void evaluate_command(std::string command, int argc, std::vector<std::string> argv);
 };
 
 #endif // SHELL_CONTROLER_H
