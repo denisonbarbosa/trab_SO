@@ -201,8 +201,7 @@ pid_t Shell::exec_program(std::string program_name, std::vector<std::string> arg
         auto pid = fork();
         if (pid == 0)
         {
-            auto err = execv(program.c_str(), argv);
-            exit(1);
+            execv(program.c_str(), argv);
         }
 
         this->children.emplace(pid, program_name);
@@ -225,8 +224,8 @@ std::string Shell::search_program(std::string program_name)
         {
             while (entry = readdir(dp))
             {
-                if (program_name.compare(entry->d_name))
-                    ret = path.append(entry->d_name);
+                if (program_name.compare(entry->d_name) == 0)
+                    ret = (path + "/").append(entry->d_name);
             }
         }
 
@@ -252,7 +251,7 @@ std::vector<std::string> Shell::break_env_var(std::string var_name)
     while ((position = content.find(':')) != std::string::npos)
     {
         pieces.push_back(content.substr(0, position));
-        content.erase(position + 1);
+        content.erase(0, position + 1);
     }
     return pieces;
 }
