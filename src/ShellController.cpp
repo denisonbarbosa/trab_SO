@@ -1,5 +1,10 @@
 #include "ShellController.h"
 
+Shell* ShellController::get_active_shell()
+{
+    return this->active_shell;
+}
+
 ShellController::ShellController()
 {
     this->active_shell = new Shell();
@@ -26,10 +31,13 @@ void ShellController::read_command()
     }
     catch (const std::iostream::failure &e)
     {
-        if (std::cin.fail() || std::cin.eof())
-            std::cout << "Error: " << e.what() << std::endl;
+        std::cout << std::endl;
         this->active_shell->command_exit();
     }
+
+    if (buffer.empty())
+        return;
+
     active_shell->push_history(buffer);
 
     // Iterates through buffer and breaks it into the args
@@ -107,6 +115,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
             if (active_shell->is_waiting())
             {
                 waitpid(child_pid, nullptr, 0);
+                active_shell->remove_child(child_pid);
             }
         }
     }

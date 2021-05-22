@@ -25,25 +25,146 @@ private:
     bool waiting = false;
 
 public:
+    /**
+    * @brief Construct a new Shell:: Shell object
+    * 
+    */
     Shell();
+
+    /**
+     * @brief Destroy the Shell object
+     * 
+     */
     ~Shell();
-    const std::string get_var_content(std::string);
-    void push_history(std::string);                                             // adds ${arg} to the end of history list
-    void pop_history();                                                         // removes first command in history
-    void command_history();                                                     // Show last 50 commands
-    void command_exit();                                                        // close the shell
-    void command_kill(pid_t, std::string);                                      // kills the ${arg} process
-    void command_jobs();                                                        // lists all jobs on the background
-    void command_export(std::string entry);                                     // (re)defines environment variable
-    void command_cd(std::string arg);                                           // directory navigation | update PDW
-    void command_echo(std::string arg);                                         // Prints ${arg} content on screen
-    void command_fg(std::string arg);                                           // puts process ${arg} on foreground
-    void command_bg(std::string arg);                                           // puts process ${arg} on background
-    void command_set();                                                         // show all environment variables
-    pid_t exec_program(std::string programName, std::vector<std::string> args); // executes a program
+
+    /**
+     * @brief Removes the specified child from the children list
+     * 
+     * @param child_pid pid of the child to be removed
+     */
+    void remove_child(pid_t child_pid);
+
+    /**
+     * @brief Returns the content of the specified variable
+     * 
+     * @param var_name 
+     * @return const std::string 
+     */
+    const std::string get_var_content(std::string var_name);
+    
+    /**
+     * @brief Adds a command to the list of commands
+     * 
+     * @param cmd string containing the entire command
+     */
+    void push_history(std::string cmd);
+    
+    /**
+     * @brief Removes the first ("oldest") command of the list
+     * 
+     */
+    void pop_history();
+    
+    /**
+     * @brief Shows the last 50 commands used
+     * 
+     */
+    void command_history();
+    
+    /**
+     * @brief Exit the application
+     * 
+     */
+    void command_exit();
+
+    /**
+     * @brief Sends a signal to the specified process
+     * 
+     * @param process_pid PID of the process that will receive the signal
+     * @param signal Name of the signal to send
+     */
+    void command_kill(pid_t process_pid, std::string signal);
+    
+    /**
+     * @brief Lists all jobs in the background
+     * 
+     */
+    void command_jobs();
+
+    /**
+     * @brief (Re)defines the specified environment variable
+     * 
+     * @param entry String containing the new content
+     */
+    void command_export(std::string entry);
+
+    /**
+     * @brief Navigates to the specified directory
+     * 
+     * @param arg Relative path to the directory
+     */
+    void command_cd(std::string arg);
+
+        /**
+     * @brief Prints the content of the specified env_var or the string passed 
+     * 
+     * @param arg Value to be printed
+     */
+    void command_echo(std::string arg);
+    
+    /**
+     * @brief Puts the specified process on foreground
+     * 
+     * @param arg Pid of the process
+     */
+    void command_fg(std::string arg);
+
+    /**
+     * @brief Puts the specified process on background
+     * 
+     * @param arg Pid of the process
+     */
+    void command_bg(std::string arg);
+
+    /**
+     * @brief Prints all the environment variables
+     * 
+     */
+    void command_set();
+
+    /**
+     * @brief Executes the specified program
+     * 
+     * @param program_name Name of the program to execute
+     * @param args Vector of arguments
+     * @return id of the new process created
+     */
+    pid_t exec_program(std::string programName, std::vector<std::string> args);
+
+    /**
+     * @brief Searches for the directory containing the specified program
+     * 
+     * @param program_name Name of the program to search
+     * @return Path to the directory
+     */
     std::string search_program(std::string program_name);
-    std::vector<std::string> break_env_var(std::string var_name); // turns env_var string into std::vector
+
+    /**
+     * @brief Breaks the string value of the specified var into a vector
+     * 
+     * @param var_name Name of the variable
+     * @return std::vector<std::string> 
+     */
+    std::vector<std::string> break_env_var(std::string var_name);
+
+
     inline auto is_waiting() const;
+    
+    /**
+     * @brief Sets waiting status of the Shell
+     * 
+     * @param status 
+     */
     void set_waiting(bool);
 };
 

@@ -4,12 +4,14 @@ void sigint_handler(int sig_number);
 void sigtstp_handler(int sig_number);
 void sigchld_handler(int sig_number);
 
+const auto controller = new ShellController();
+
 int main()
 {
-    auto controller = new ShellController();
-    // signal(SIGINT, sigint_handler);
-    // signal(SIGTSTP, sigtstp_handler);
-    // signal(SIGCHLD, sigchld_handler);
+    
+    signal(SIGINT, sigint_handler);
+    signal(SIGTSTP, sigtstp_handler);
+    signal(SIGCHLD, sigchld_handler);
     while (true)
     {
         controller->read_command();
@@ -35,9 +37,9 @@ void sigchld_handler(int sig_number) // Avoid creating zombie processes
 {
     if (sig_number == SIGCHLD) // Terminated or stopped child
     {
-        signal(SIGCHLD, SIG_IGN);
+        auto pid = wait(nullptr);
+        auto active_shell = controller->get_active_shell();
+        active_shell->remove_child(pid);
         return;
-    }    
-    
-    
+    }
 }
