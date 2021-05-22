@@ -10,7 +10,7 @@
 class ShellController
 {
 private:
-    Shell *active_shell;
+    Shell *active_shell = new Shell();
 
 public:
     /**
@@ -33,6 +33,12 @@ public:
     Shell* get_active_shell();
 
     /**
+     * @brief 
+     * 
+     */
+    void start_shell_loop();
+    
+    /**
      * @brief Reads the user input and treats it
      * 
      */
@@ -44,10 +50,8 @@ public:
      * @param command Command to execute
      * @param argc Number of arguments
      * @param argv Vector of arguments
-     * @return true If executed correctly
-     * @return false If some error ocurred
      */
-    bool evaluate_command(std::string command, int argc, std::vector<std::string> argv);
+    void evaluate_command(std::string command, int argc, std::vector<std::string> argv);
 };
 
 #endif // SHELL_CONTROLER_H

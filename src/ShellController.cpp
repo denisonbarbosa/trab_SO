@@ -1,17 +1,26 @@
 #include "ShellController.h"
 
-Shell* ShellController::get_active_shell()
+Shell *ShellController::get_active_shell()
 {
     return this->active_shell;
 }
 
 ShellController::ShellController()
 {
-    this->active_shell = new Shell();
 }
 
 ShellController::~ShellController()
 {
+}
+
+void ShellController::start_shell_loop()
+{
+    std::cin.exceptions(std::cin.failbit | std::cin.eofbit);
+    while (true)        
+    {
+        std::cout << this << std::endl;
+        this->read_command();
+    }
 }
 
 void ShellController::read_command()
@@ -22,8 +31,7 @@ void ShellController::read_command()
 
     auto myps1_content = active_shell->get_var_content("MYPS1");
     std::cout << myps1_content << "$ ";
-
-    std::cin.exceptions(std::cin.failbit | std::cin.eofbit);
+    
     try
     {
         std::getline(std::cin, buffer);
@@ -33,12 +41,11 @@ void ShellController::read_command()
         std::cout << std::endl;
         this->active_shell->command_exit();
     }
-    if(buffer.find_first_not_of(" ") == buffer.npos)
+    if (buffer.find_first_not_of(" ") == buffer.npos)
         return;
 
     active_shell->push_history(buffer);
 
-    // Iterates through buffer and breaks it into the args
     std::istringstream buffer_stream(buffer);
     while (std::getline(buffer_stream, aux, ' '))
     {
@@ -50,10 +57,11 @@ void ShellController::read_command()
     command.assign(argv[0].c_str());
     argv.erase(argv.begin());
 
-    bool status = this->evaluate_command(command, argc, argv);
+    this->evaluate_command(command, argc, argv);
+    return;
 }
 
-bool ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
+void ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
 {
     if (command.compare("history") == 0)
     {
@@ -78,7 +86,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     else if (command.compare("cd") == 0)
     {
         if (argv.empty())
-            active_shell->command_cd();    
+            active_shell->command_cd();
         else
             active_shell->command_cd(argv[0]);
     }
@@ -102,6 +110,7 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else
     {
+        /*
         this->active_shell->set_waiting(true);
         if(argc > 0){
             if (argv[argc-1] == "&")
@@ -110,19 +119,37 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
                 argv.pop_back();
             }
         }
-
-        this->active_shell->exec_program(command, argv);
-        
-        /*
-        if (child_pid > 0)
-        {
-            if (active_shell->is_waiting())
-            {
-                waitpid(child_pid, nullptr, 0);
-                active_shell->remove_child(child_pid);
-            }
-        }
         */
+
+        // this->active_shell->exec_program(command, argv);
+        
+        auto program = this->active_shell->search_program(command);
+
+        if (program.empty())
+            return;
+
+        char *args[argv.size() + 2];
+        command.copy(args[0], command.length(), 0);
+        int argc = 1;
+        for (auto arg : argv)
+            arg.copy(args[argc++], arg.length(), 0);
+        args[argc] = nullptr;
+
+        int child_pid = fork();
+
+        if (child_pid == 0)
+        {
+            execv(program.c_str(), args);
+            exit(0);
+        }
+        else if (child_pid > 0)
+        {
+            int child_status;
+            pid_t tpid;
+            do
+            {
+                tpid = wait(&child_status);
+            } while (tpid != child_pid);
+        }
     }
-    return true;
 }

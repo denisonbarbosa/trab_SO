@@ -227,54 +227,35 @@ void Shell::command_set()
 
 void Shell::exec_program(std::string program_name, std::vector<std::string> args)
 {   
-    /*
-    auto pid = fork();
-    if (pid < 0) 
-    {
-        exit(-1);
-    }
-    else if (pid == 0)
-    {
-        
-    } else if (pid > 0) 
-    {
-
-    }
-    
-    */
-
     auto program = search_program(program_name);
-    if (!program.empty())
+
+    if (program.empty())
+        return;
+
+    char* argv[args.size()+2];
+    program_name.copy(argv[0], program_name.length(), 0);
+    int argc = 1;
+    for (auto arg : args)
+        arg.copy(argv[argc++], arg.length(), 0);
+    argv[argc] = nullptr;
+
+    int child_pid = fork();
+    
+    if (child_pid == 0)
     {
-
-        char* argv[args.size()+2];
-        program_name.copy(argv[0], program_name.length(), 0);
-        int argc = 1;
-        for (auto arg : args)
-            arg.copy(argv[argc++], arg.length(), 0);
-        
-        argv[argc] = nullptr;
-
-        auto pid = fork();
-        if (pid < 0) 
+        execv(program.c_str(), argv);
+        exit(0);
+    }
+    else if (child_pid > 0)
+    {
+        int child_status;
+        pid_t tpid;
+        do 
         {
-            exit(-1);
+            tpid = wait(&child_status);
         }
-        else if (pid == 0)
-        {
-            execv(program.c_str(), argv);
-        }
-        else if (pid > 0)
-        {
-            this->children.emplace(pid, program_name);
-            //pid = wait(nullptr);
-            //this->remove_child(pid);
-            if (this->is_waiting())
-            {
-                auto stat = waitpid(pid, nullptr, 0);
-                this->remove_child(pid);
-            }
-        }
+        while (tpid != child_pid);
+        return;
     }
 }
 
