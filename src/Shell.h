@@ -5,6 +5,7 @@
 #include <list>
 #include <unordered_map>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <unistd.h>
 #include <signal.h>
@@ -97,6 +98,12 @@ public:
      */
     void command_export(std::string entry);
 
+    /**
+     * @brief Navigates to home directory
+     * 
+     */
+    void command_cd();
+    
     /**
      * @brief Navigates to the specified directory
      * 

@@ -140,16 +140,40 @@ void Shell::command_export(std::string entry)
     env_var->second = content;
 }
 
+void Shell::command_cd()
+{
+    chdir(this->get_var_content("MYHOME").c_str());
+    this->command_export("PWD="+this->get_var_content("MYHOME"));
+}
+
 void Shell::command_cd(std::string arg)
 {
-    auto path = this->env_vars.find("PWD")->second;
-    path.append(arg);
+    std::string aux, path;
+    std::vector<std::string> pwd_pieces;
+    
+    std::istringstream pwd_stream(this->get_var_content("PWD"));
+    while (std::getline(pwd_stream, aux, '/'))
+    {
+        pwd_pieces.push_back(aux);
+    }
+    
+    std::istringstream path_stream(arg);
+    while (std::getline(path_stream, aux, '/'))
+    {
+        if (aux.compare("..") == 0)
+            pwd_pieces.pop_back();
+        else
+            pwd_pieces.push_back(aux);
+    }
+
+    for (auto piece : pwd_pieces)
+    {
+        path.append(piece + "/");
+    }
+    
     chdir(path.c_str());
 
-    std::string content;
-    content.assign("PWD=");
-    content.append(path);
-    this->command_export(content);
+    this->command_export("PWD=" + path);
 }
 
 void Shell::command_echo(std::string arg)

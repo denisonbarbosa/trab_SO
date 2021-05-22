@@ -78,8 +78,10 @@ bool ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else if (command.compare("cd") == 0)
     {
-        // TODO: validate argument
-        active_shell->command_cd(argv[0]); // 8 - Implemented - NOT WORKING AS IT SHOULD
+        if (argv.empty())
+            active_shell->command_cd();    
+        else
+            active_shell->command_cd(argv[0]); // 8 - Implemented - NOT WORKING AS IT SHOULD
     }
     else if (command.compare("echo") == 0)
     {
