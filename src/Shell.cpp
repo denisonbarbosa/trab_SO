@@ -225,7 +225,7 @@ void Shell::command_set()
     }
 }
 
-void Shell::exec_program(std::string command, int argc ,std::vector<std::string> argv)
+void Shell::exec_program(std::string command, int argc ,std::vector<std::string> argv, bool wait)
 {   
     auto program = this->search_program(command);
 
@@ -258,7 +258,10 @@ void Shell::exec_program(std::string command, int argc ,std::vector<std::string>
     }
     else if (child_pid > 0)
     {
-        waitpid(child_pid, &child_status, 0);
+        if (wait)
+            waitpid(child_pid, &child_status, 0);
+        else
+            this->children.emplace(child_pid, command);
     }
 }
 
@@ -309,14 +312,4 @@ std::vector<std::string> Shell::break_env_var(std::string var_name)
         content.erase(0, position + 1);
     }
     return pieces;
-}
-
-void Shell::set_waiting(bool status)
-{
-    this->waiting = status;
-}
-
-bool Shell::is_waiting()
-{
-    return this->waiting;
 }

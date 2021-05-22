@@ -109,6 +109,15 @@ void ShellController::evaluate_command(std::string command, int argc, std::vecto
     }
     else
     {
-        this->active_shell->exec_program(command, argc, argv);
+        bool wait = true;
+        if (!argv.empty())
+        {
+            if(argv[argv.size() - 1] == "&")
+            {
+                wait = false;
+                argv.pop_back();
+            }
+        }
+        this->active_shell->exec_program(command, argc, argv, wait);
     }
 }

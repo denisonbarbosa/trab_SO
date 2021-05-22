@@ -22,7 +22,6 @@ private:
     std::unordered_map<std::string, std::string> env_vars; // Map that stores the environment variables | name -> value
     std::unordered_map<pid_t, std::string> children;       // Map that stores active processes | pid -> program_name
     std::unordered_map<std::string, int> SIGNALS;          // Map that stores all the possible signals | sig_name -> sig_number
-    bool waiting = false;
 
 public:
     /**
@@ -146,7 +145,7 @@ public:
      * @param argv Vector of arguments
      * @return id of the new process created
      */
-    void exec_program(std::string programName, int argc,std::vector<std::string> argv);
+    void exec_program(std::string programName, int argc,std::vector<std::string> argv, bool wait);
 
     /**
      * @brief Searches for the directory containing the specified program
@@ -163,20 +162,5 @@ public:
      * @return std::vector<std::string> 
      */
     std::vector<std::string> break_env_var(std::string var_name);
-
-    /**
-     * @brief Checks if Shell is waiting
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool is_waiting();
-
-    /**
-     * @brief Sets waiting status of the Shell
-     * 
-     * @param status 
-     */
-    void set_waiting(bool);
 };
 #endif // SHELL_H
