@@ -51,16 +51,16 @@ void ShellController::read_command()
         argv.push_back(aux);
         argc++;
     }
-    argc--;
+    // argc--; unused
 
     command.assign(argv[0].c_str());
     argv.erase(argv.begin());
     
-    this->evaluate_command(command, argc, argv);
+    this->evaluate_command(command, argv);
     return;
 }
 
-void ShellController::evaluate_command(std::string command, int argc, std::vector<std::string> argv)
+void ShellController::evaluate_command(std::string command, std::vector<std::string> argv)
 {
     if (command.compare("history") == 0)
     {
@@ -118,6 +118,6 @@ void ShellController::evaluate_command(std::string command, int argc, std::vecto
                 argv.pop_back();
             }
         }
-        this->active_shell->exec_program(command, argc, argv, wait);
+        this->active_shell->exec_program(command, argv, wait);
     }
 }

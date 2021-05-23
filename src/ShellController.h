@@ -48,10 +48,9 @@ public:
      * @brief Evaluates the command and calls the correct Shell method
      * 
      * @param command Command to execute
-     * @param argc Number of arguments
      * @param argv Vector of arguments
      */
-    void evaluate_command(std::string command, int argc, std::vector<std::string> argv);
+    void evaluate_command(std::string command, std::vector<std::string> argv);
 };
 
 #endif // SHELL_CONTROLER_H

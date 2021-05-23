@@ -227,18 +227,23 @@ void Shell::command_set()
     }
 }
 
-void Shell::exec_program(std::string command, int argc, std::vector<std::string> argv, bool wait)
+void Shell::exec_program(std::string command, std::vector<std::string> argv, bool wait)
 {
     auto program = this->search_program(command);
 
     int child_pid = fork();
     int child_status;
-    char * placeholder;
     if (child_pid == 0)
     {
         char **args = (char **)malloc(argv.size() + 2);
         int fd_in = 0, fd_out = 0, fd_err = 0;
-
+        /*
+            fd_pipe[0] - read
+            fd_pipe[1] - write
+        */
+        int fd_pipe[2][2];
+        int pipe_level = 0;
+        
         if (program.empty())
             this->command_exit();
 
@@ -280,9 +285,45 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
                                   S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH); // Sets the ownership and gives 775 permission
                 }
             }
-            else if (argv[i].compare("||") == 0) // pipe
+            else if (argv[i].compare("|") == 0) // pipe
             {
-                // TODO
+                if (i+1 < argv.size() && pipe_level < 2)
+                {
+                    if(pipe(fd_pipe[pipe_level++]) < 0)
+                        exit(1);
+                    child_pid = fork();
+                    
+
+                    if (child_pid > 0)
+                    {
+                        if (pipe_level > 0)
+                        {
+                            close(fd_pipe[pipe_level-1][1]);
+                            dup2(fd_pipe[pipe_level-1][0], STDIN_FILENO);
+                            close(fd_pipe[pipe_level-1][0]);
+                            waitpid(child_pid, nullptr, 0);
+                        }
+                        break;
+                    }
+                    else if (child_pid == 0)
+                    {
+                        program = search_program(argv[i+1]);
+                        args = (char **)malloc(argv.size() + 1 - i);
+                        
+                        if (program.empty())
+                            this->command_exit();
+
+                        for (int c = 0; c < argv.size() + 1 - i; c++)
+                        {
+                            args[c] = (char *)malloc(50 * sizeof(char));
+                        }
+                        c_arg = 0;
+
+                        close(fd_pipe[pipe_level-1][0]);
+                        dup2(fd_pipe[pipe_level-1][1], STDOUT_FILENO);
+                        close(fd_pipe[pipe_level-1][1]);
+                    }
+                }
             }
             else
             {
