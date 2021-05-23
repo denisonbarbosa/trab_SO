@@ -259,8 +259,7 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
                 {
                     fd_in = open(argv[++i].c_str(),
                                  O_RDONLY,
-                                 S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH, // Sets the ownership and gives 775 permission
-                                 S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH);
+                                 S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH); // Sets the ownership and gives 775 permission
                 }
             }
             else if (argv[i].compare(">") == 0) // saida
