@@ -34,7 +34,6 @@ Shell::Shell()
 
 Shell::~Shell()
 {
-    std::cout << "~Shell called by" << this << std::endl;
 }
 
 void Shell::remove_child(pid_t child_pid)
@@ -52,7 +51,7 @@ const std::string Shell::get_var_content(std::string var_name)
     return var->second;
 }
 
-void Shell::push_history(std::string cmd) 
+void Shell::push_history(std::string cmd)
 {
     if (this->historySize == 50)
     {
@@ -144,14 +143,14 @@ void Shell::command_export(std::string entry)
 void Shell::command_cd()
 {
     chdir(this->get_var_content("MYHOME").c_str());
-    this->command_export("PWD="+this->get_var_content("MYHOME"));
+    this->command_export("PWD=" + this->get_var_content("MYHOME"));
 }
 
 void Shell::command_cd(std::string arg)
 {
     std::string aux, path;
     std::vector<std::string> pieces;
-    
+
     if (arg[0] == '/')
     {
         path.assign(arg);
@@ -163,7 +162,7 @@ void Shell::command_cd(std::string arg)
         {
             pieces.push_back(aux);
         }
-        
+
         std::istringstream path_stream(arg);
         while (std::getline(path_stream, aux, '/'))
         {
@@ -178,7 +177,7 @@ void Shell::command_cd(std::string arg)
             path.append(piece + "/");
         }
     }
-    
+
     if (chdir(path.c_str()) != 0)
     {
         std::cout << "chdir() failed " << std::endl;
@@ -225,57 +224,80 @@ void Shell::command_set()
     }
 }
 
-void Shell::exec_program(std::string command, int argc ,std::vector<std::string> argv, bool wait)
-{   
+void Shell::exec_program(std::string command, int argc, std::vector<std::string> argv, bool wait)
+{
     auto program = this->search_program(command);
-    char** args = (char**)malloc(argv.size() + 2);
-    int fd_in, fd_out, fd_err;
-    int i = 0;
-
-    if (program.empty())
-        return;
-
-    for (int c = 0; c < argv.size() + 2; c++)
-    {
-        args[c] = (char*)malloc(100 * sizeof(char));
-    }
-
-    command.copy(args[0], command.length());
-    
-    for (; i < argv.size(); i++)
-    {
-        if(argv[i].compare("<")) // entrada
-        {
-            if(i+1 < argv.size())
-                fd_in = open(argv[++i].c_str(), O_RDONLY);
-        }
-        else if(argv[i].compare(">")) // saida
-        {
-            if(i+1 < argv.size())
-                fd_out = open(argv[++i].c_str(), O_WRONLY);
-        }
-        else if(argv[i].compare("2>")) // erro
-        {
-            if(i+1 < argv.size())
-                fd_err = open(argv[++i].c_str(), O_WRONLY);
-        }
-        else if(argv[i].compare("||")) // pipe
-        {
-            // TODO
-        }
-        else
-        {
-            argv[i].copy(args[i+1], argv[i].length());
-        }
-    }
-    i++;
-    args[i] = nullptr;
 
     int child_pid = fork();
     int child_status;
-
     if (child_pid == 0)
     {
+        char **args = (char **)malloc(argv.size() + 2);
+        int fd_in = 0, fd_out = 0, fd_err = 0;
+
+        if (program.empty())
+            this->command_exit();
+
+        for (int c = 0; c < argv.size() + 2; c++)
+        {
+            args[c] = (char *)malloc(100 * sizeof(char));
+        }
+
+        command.copy(args[0], command.length());
+
+        int i = 0;
+        int c_arg = 1;
+        for (; i < argv.size(); i++)
+        {
+            if (argv[i].compare("<") == 0) // entrada
+            {
+                if (i + 1 < argv.size())
+                {
+                    fd_in = open(argv[++i].c_str(), O_RDONLY);
+                }
+            }
+            else if (argv[i].compare(">") == 0) // saida
+            {
+                if (i + 1 < argv.size())
+                {
+                    // CHECK OVERWRITE ERROR
+                    fd_out = open(argv[++i].c_str(), O_TRUNC | O_WRONLY | O_CREAT);
+                }
+            }
+            else if (argv[i].compare("2>") == 0) // erro
+            {
+                if (i + 1 < argv.size())
+                {
+                    fd_err = open(argv[++i].c_str(), O_WRONLY);
+                }
+            }
+            else if (argv[i].compare("||") == 0) // pipe
+            {
+                // TODO
+            }
+            else
+            {
+                argv[i].copy(args[c_arg++], argv[i].length());
+            }
+        }
+        args[c_arg] = nullptr;
+
+        if (fd_in > 0)
+        {
+            dup2(fd_in, STDIN_FILENO);
+            close(fd_in);
+        }
+        if (fd_out > 0)
+        {
+            dup2(fd_out, STDOUT_FILENO);
+            close(fd_out);
+        }
+        if (fd_err > 0)
+        {
+            dup2(fd_err, STDERR_FILENO);
+            close(fd_err);
+        }
+
         execv(program.c_str(), args);
         exit(0);
     }

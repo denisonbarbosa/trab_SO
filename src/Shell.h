@@ -139,11 +139,12 @@ public:
     void command_set();
 
     /**
-     * @brief Executes the specified program
+     * @brief Executes the specified program on a child process
      * 
      * @param program_name Name of the program to execute
      * @param arc Number of arguments
      * @param argv Vector of arguments
+     * @param wait Specifies wheter the parent needs to wait for the child to finish
      * @return id of the new process created
      */
     void exec_program(std::string programName, int argc,std::vector<std::string> argv, bool wait);
