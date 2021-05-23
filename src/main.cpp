@@ -6,14 +6,14 @@ ShellController* const controller = new ShellController();
 
 int main()
 {
-    // signal(SIGINT, sig_handler);
-    // signal(SIGTSTP, sig_handler);
+    signal(SIGINT, sig_handler);
+    signal(SIGTSTP, sig_handler);
     signal(SIGCHLD, sig_handler);
     controller->start_shell_loop();
 }
 
 /**
- * @brief 
+ * @brief Signal handler to customize the treatment of specific signals
  * 
  * @param sig_number 
  */
