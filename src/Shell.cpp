@@ -88,7 +88,10 @@ void Shell::command_kill(pid_t process_pid, std::string signal)
 {
     auto sig_iter = this->SIGNALS.find(signal);
     if (sig_iter == this->SIGNALS.end())
+    {
+        std::cout << "Signal " << signal << " not registered in signal map" << std::endl;
         return;
+    }
 
     kill(process_pid, sig_iter->second);
 }
@@ -218,9 +221,9 @@ void Shell::command_bg(std::string arg)
 
 void Shell::command_set()
 {
-    for (auto const var : this->env_vars) // For each environment variable in the data structure
+    for (auto const var : this->env_vars)
     {
-        std::cout << "$" << var.first << " = " << var.second << std::endl; // Print "name = content"
+        std::cout << "$" << var.first << " = " << var.second << std::endl;
     }
 }
 
@@ -230,6 +233,7 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
 
     int child_pid = fork();
     int child_status;
+    char * placeholder;
     if (child_pid == 0)
     {
         char **args = (char **)malloc(argv.size() + 2);
@@ -240,7 +244,7 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
 
         for (int c = 0; c < argv.size() + 2; c++)
         {
-            args[c] = (char *)malloc(100 * sizeof(char));
+            args[c] = (char *)malloc(50 * sizeof(char));
         }
 
         command.copy(args[0], command.length());
@@ -253,22 +257,28 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
             {
                 if (i + 1 < argv.size())
                 {
-                    fd_in = open(argv[++i].c_str(), O_RDONLY);
+                    fd_in = open(argv[++i].c_str(),
+                                 O_RDONLY,
+                                 S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH, // Sets the ownership and gives 775 permission
+                                 S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH);
                 }
             }
             else if (argv[i].compare(">") == 0) // saida
             {
                 if (i + 1 < argv.size())
                 {
-                    // CHECK OVERWRITE ERROR
-                    fd_out = open(argv[++i].c_str(), O_TRUNC | O_WRONLY | O_CREAT);
+                    fd_out = open(argv[++i].c_str(),
+                                  O_TRUNC | O_WRONLY | O_CREAT,
+                                  S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH); // Sets the ownership and gives 775 permission
                 }
             }
             else if (argv[i].compare("2>") == 0) // erro
             {
                 if (i + 1 < argv.size())
                 {
-                    fd_err = open(argv[++i].c_str(), O_WRONLY);
+                    fd_err = open(argv[++i].c_str(),
+                                  O_WRONLY,
+                                  S_IRWXU | S_ISUID | S_IRWXG | S_IROTH | S_IXOTH); // Sets the ownership and gives 775 permission
                 }
             }
             else if (argv[i].compare("||") == 0) // pipe
@@ -278,6 +288,7 @@ void Shell::exec_program(std::string command, int argc, std::vector<std::string>
             else
             {
                 argv[i].copy(args[c_arg++], argv[i].length());
+                args[c_arg-1][argv[i].length()] = '\0'; 
             }
         }
         args[c_arg] = nullptr;
